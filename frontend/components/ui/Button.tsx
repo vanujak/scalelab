@@ -4,6 +4,7 @@ type ButtonProps = {
   children: React.ReactNode;
   href?: string;
   variant?: "primary" | "secondary";
+  type?: "button" | "submit" | "reset";
 };
 
 const variants = {
@@ -11,7 +12,7 @@ const variants = {
   secondary: "border border-slate-300 bg-white text-slate-900 hover:border-sky-300 hover:bg-sky-50",
 };
 
-export function Button({ children, href, variant = "secondary" }: ButtonProps) {
+export function Button({ children, href, variant = "secondary", type = "button" }: ButtonProps) {
   const className = `inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition ${variants[variant]}`;
 
   if (href) {
@@ -22,5 +23,9 @@ export function Button({ children, href, variant = "secondary" }: ButtonProps) {
     );
   }
 
-  return <button className={className}>{children}</button>;
+  return (
+    <button type={type} className={className}>
+      {children}
+    </button>
+  );
 }

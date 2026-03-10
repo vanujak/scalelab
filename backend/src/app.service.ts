@@ -7,7 +7,7 @@ export class AppService {
       name: 'ScaleLab API',
       version: '0.1.0',
       status: 'ok',
-      modules: ['systems', 'simulation', 'metrics'],
+      modules: ['users', 'systems', 'simulation', 'metrics'],
     };
   }
 }

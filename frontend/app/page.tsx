@@ -28,9 +28,17 @@ export default function Home() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_34%),linear-gradient(180deg,_#07111f_0%,_#0f172a_48%,_#e2e8f0_48%,_#f8fafc_100%)] text-slate-950">
       <section className="mx-auto flex min-h-[40rem] max-w-6xl flex-col justify-between px-6 py-16 sm:px-10 lg:px-12">
         <div className="space-y-6 text-slate-100">
-          <p className="text-sm font-medium uppercase tracking-[0.35em] text-cyan-300">
-            ScaleLab
-          </p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium uppercase tracking-[0.35em] text-cyan-300">
+              ScaleLab
+            </p>
+            <div className="flex gap-3">
+              <Button href="/login">Login</Button>
+              <Button href="/signup" variant="primary">
+                Sign up
+              </Button>
+            </div>
+          </div>
           <div className="max-w-3xl space-y-5">
             <h1 className="font-sans text-5xl leading-tight font-semibold sm:text-6xl">
               Design distributed systems and test their weak points before production.
@@ -46,6 +54,9 @@ export default function Home() {
             </Button>
             <Button href="/simulation" variant="secondary">
               Explore simulation view
+            </Button>
+            <Button href="/signup" variant="secondary">
+              Create account
             </Button>
           </div>
         </div>
