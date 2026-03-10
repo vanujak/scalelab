@@ -15,8 +15,13 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return the API overview', () => {
+      expect(appController.getOverview()).toEqual({
+        name: 'ScaleLab API',
+        version: '0.1.0',
+        status: 'ok',
+        modules: ['systems', 'simulation', 'metrics'],
+      });
     });
   });
 });
