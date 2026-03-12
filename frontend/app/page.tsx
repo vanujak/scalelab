@@ -1,275 +1,186 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { systemsService } from "@/services/systems.service";
-import { formatNumber } from "@/utils/helpers";
 
-const pillars = [
+const features = [
   {
-    title: "Model the topology",
+    title: "Model Topology",
     description:
-      "Lay out clients, balancers, services, queues, caches, and databases as one operational system.",
+      "Visually construct clients, load balancers, and databases into a single operational reality.",
   },
   {
-    title: "Rehearse load",
+    title: "Simulate Traffic",
     description:
-      "Push traffic through the graph with different routing assumptions and compare the pressure points.",
+      "Inject realistic load patterns and observe how your architecture routing handles the pressure.",
   },
   {
-    title: "Read the failure shape",
+    title: "Analyze Insight",
     description:
-      "Spot latency spikes, low cache efficiency, and resource saturation before the design reaches production.",
+      "Spot hidden latency spikes and resource saturation before your application hits production.",
   },
-];
-
-const snapshots = [
-  { label: "Active systems", value: "12", tone: "text-cyan-300" },
-  { label: "Peak traffic", value: "18k rpm", tone: "text-emerald-300" },
-  { label: "Median latency", value: "182 ms", tone: "text-amber-300" },
-];
-
-const simulationSteps = [
-  "Sketch the request path with reusable infrastructure nodes.",
-  "Choose a traffic profile and balancing strategy.",
-  "Replay the run and inspect bottlenecks in context.",
 ];
 
 export default function Home() {
   const systems = systemsService.list();
-  const featuredSystemName = systems[0]?.name ?? "your first architecture";
+  const featuredSystemName = systems[0]?.name ?? "your architecture";
 
   return (
-    <main className="min-h-screen text-slate-100">
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-8rem] top-[-6rem] h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
-          <div className="absolute right-[-6rem] top-24 h-80 w-80 rounded-full bg-sky-500/15 blur-3xl" />
-          <div className="absolute bottom-[-8rem] left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
-        </div>
+    <main className="min-h-screen bg-[#020617] text-slate-100 selection:bg-cyan-500/30">
+      {/* Background Gradients */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[120px]" />
+        <div className="absolute right-0 top-[20%] h-[600px] w-[600px] rounded-full bg-blue-600/10 blur-[150px]" />
+        <div className="absolute -bottom-[20%] left-[20%] h-[600px] w-[600px] rounded-full bg-emerald-500/10 blur-[150px]" />
+      </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
-          <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.45em] text-cyan-300">ScaleLab</p>
-              <p className="mt-2 text-sm text-slate-400">
-                Distributed architecture design and simulation workspace
-              </p>
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-12 lg:px-20">
+        {/* Navigation */}
+        <header className="flex items-center justify-between py-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20">
+              <div className="h-3 w-3 rounded-full bg-white" />
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button href="/login" variant="ghost">
-                Login
-              </Button>
-              <Button href="/signup" variant="primary">
-                Sign up
-              </Button>
-            </div>
-          </header>
-
-          <div className="grid gap-12 pb-16 pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-24">
-            <div className="space-y-8 text-slate-100">
-              <div className="inline-flex rounded-full border border-cyan-300/20 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.3em] text-cyan-200 backdrop-blur-sm">
-                Design. Simulate. Diagnose.
-              </div>
-              <div className="space-y-6">
-                <h1 className="max-w-4xl text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl xl:text-7xl">
-                  Sketch load paths.
-                  <span className="block text-slate-400">Stress them.</span>
-                  <span className="block">Find the crack before production does.</span>
-                </h1>
-                <p className="max-w-2xl text-lg leading-8 text-slate-300">
-                  ScaleLab turns system design into an interactive lab. Model the architecture,
-                  simulate traffic, and read the metrics as if the incident already happened.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Button href="/systems" variant="primary">
-                  Start with a system
-                </Button>
-                <Button href="/simulation" variant="ghost">
-                  Open simulation lab
-                </Button>
-                <Button href="/dashboard" variant="ghost">
-                  View metrics dashboard
-                </Button>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                {snapshots.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-3xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm"
-                  >
-                    <p className="text-xs uppercase tracking-[0.25em] text-slate-400">{item.label}</p>
-                    <p className={`mt-3 text-2xl font-semibold ${item.tone}`}>{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute -left-6 top-8 h-24 w-24 rounded-full bg-cyan-400/20 blur-2xl" />
-              <div className="rounded-[2rem] border border-white/10 bg-slate-950/55 p-5 shadow-2xl shadow-black/30 backdrop-blur-md">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">Live canvas</p>
-                    <h2 className="mt-2 text-xl font-semibold text-white">Checkout request path</h2>
-                  </div>
-                  <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
-                    Simulation ready
-                  </div>
-                </div>
-
-                <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                  <div className="rounded-[1.5rem] border border-white/10 bg-slate-900/70 p-4">
-                    <div className="grid gap-3">
-                      <ArchitectureNode label="Users" type="Client" />
-                      <FlowConnector />
-                      <ArchitectureNode label="Global Load Balancer" type="Ingress" accent="cyan" />
-                      <FlowConnector />
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <ArchitectureNode label="API Cluster A" type="Service" accent="sky" />
-                        <ArchitectureNode label="API Cluster B" type="Service" accent="sky" />
-                      </div>
-                      <FlowConnector />
-                      <div className="grid gap-3 sm:grid-cols-[0.9fr_1.1fr]">
-                        <ArchitectureNode label="Redis Cache" type="Cache" accent="emerald" />
-                        <ArchitectureNode label="PostgreSQL" type="Storage" accent="amber" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Run profile</p>
-                      <div className="mt-4 space-y-3 text-sm text-slate-200">
-                        <MetricRow label="Traffic shape" value="flash sale burst" />
-                        <MetricRow label="Balancer" value="least connections" />
-                        <MetricRow label="Duration" value="15 min" />
-                      </div>
-                    </div>
-
-                    <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Observed metrics</p>
-                      <div className="mt-4 space-y-4">
-                        <SignalBar label="Latency" value="182 ms" width="72%" color="bg-amber-400" />
-                        <SignalBar label="Cache hit rate" value="68%" width="68%" color="bg-emerald-400" />
-                        <SignalBar label="CPU pressure" value="61%" width="61%" color="bg-cyan-400" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <span className="text-xl font-bold tracking-tight text-white">ScaleLab</span>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-12 lg:py-20">
-        <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="space-y-4">
-            <p className="text-sm font-medium uppercase tracking-[0.35em] text-cyan-300">Why ScaleLab</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              More than a diagramming app.
-            </h2>
-            <p className="max-w-lg text-base leading-7 text-slate-300">
-              The home page now frames ScaleLab as an interactive systems lab: architecture on the
-              left, runtime behavior on the right, and a clear progression from model to insight.
-            </p>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl shadow-black/10 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300">Simulation flow</p>
-              <div className="mt-4 space-y-3">
-                {simulationSteps.map((step, index) => (
-                  <div key={step} className="flex gap-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-sm font-semibold text-cyan-200 ring-1 ring-cyan-300/30">
-                      {index + 1}
-                    </div>
-                    <p className="pt-1 text-sm leading-6 text-slate-300">{step}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="flex items-center gap-4">
+            <Button href="/login" variant="ghost">
+              Sign In
+            </Button>
+            <Button href="/signup" variant="primary">
+              Get Started
+            </Button>
           </div>
+        </header>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {pillars.map((item) => (
-              <Card key={item.title} title={item.title} eyebrow="Core capability" tone="dark">
-                <p className="text-sm leading-7 text-slate-300">{item.description}</p>
-              </Card>
-            ))}
+        {/* Hero Section */}
+        <section className="flex flex-col items-center pt-24 pb-32 text-center lg:pt-32 lg:pb-40">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500"></span>
+            </span>
+            ScaleLab v1.0 is Live
           </div>
-        </div>
-      </section>
+          
+          <h1 className="max-w-4xl text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl">
+            Stress Test Your <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              Architecture.
+            </span>
+          </h1>
+          
+          <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
+            ScaleLab turns system design into an interactive laboratory. Model your infrastructure, inject peak traffic, and uncover bottlenecks before your users do.
+          </p>
 
-      <section className="border-y border-white/10 bg-white/[0.03]">
-        <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-12">
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.3em] text-cyan-300">
-                Seed systems
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold text-white">Start from realistic scenarios</h2>
-            </div>
-            <p className="text-sm text-slate-300">
-              {formatNumber(systems.length)} architecture{systems.length === 1 ? "" : "s"} scaffolded
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {systems.map((system) => (
-              <Card
-                key={system.id}
-                title={system.name}
-                eyebrow={system.status.toUpperCase()}
-                tone="dark"
-                footer={
-                  <Button href="/systems" variant="ghost">
-                    Open in workspace
-                  </Button>
-                }
-              >
-                <p className="text-sm leading-6 text-slate-300">{system.description}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {system.nodes.map((node) => (
-                    <span
-                      key={node.id}
-                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200"
-                    >
-                      {node.label}
-                    </span>
-                  ))}
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-12">
-        <div className="grid gap-6 rounded-[2rem] bg-slate-950 px-6 py-8 text-slate-100 shadow-xl shadow-slate-300/40 sm:px-8 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.3em] text-cyan-300">Ready to build</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Turn {featuredSystemName} into your first simulation.
-            </h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-300">
-              Start with a seeded system, modify the topology, and then move into the simulation lab
-              to compare tradeoffs under pressure.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button href="/systems" variant="primary">
-              Open systems
+              Start Building
             </Button>
-            <Button href="/signup" variant="ghost">
-              Create account
+            <Button href="/dashboard" variant="ghost">
+              Open Dashboard
             </Button>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Visual Showcase */}
+        <section className="mx-auto max-w-5xl pb-32">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-2 backdrop-blur-xl shadow-2xl shadow-black/50 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+            
+            <div className="flex items-center gap-3 border-b border-white/10 bg-white/5 px-6 py-4 rounded-t-[1.5rem]">
+              <div className="flex gap-2">
+                <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+                <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+                <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
+              </div>
+              <p className="ml-4 text-xs font-medium tracking-widest uppercase text-slate-400">Simulation Run: E-Commerce Surge</p>
+            </div>
+
+            <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6 p-6 lg:p-8">
+              {/* Architecture Diagram */}
+              <div className="rounded-3xl border border-white/5 bg-slate-900/50 p-6 shadow-inner">
+                <div className="flex flex-col items-center gap-4">
+                  <ArchitectureNode label="Client Traffic" type="Ingress" accent="cyan" />
+                  <FlowConnector />
+                  <ArchitectureNode label="Global Load Balancer" type="Network" accent="slate" />
+                  <FlowConnector />
+                  <div className="grid grid-cols-2 gap-4 w-full">
+                    <ArchitectureNode label="API Node 1" type="Compute" accent="blue" />
+                    <ArchitectureNode label="API Node 2" type="Compute" accent="blue" />
+                  </div>
+                  <FlowConnector />
+                  <div className="grid grid-cols-2 gap-4 w-full">
+                    <ArchitectureNode label="Redis Cluster" type="Cache" accent="emerald" />
+                    <ArchitectureNode label="PostgreSQL" type="Database" accent="amber" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Metrics Readout */}
+              <div className="flex flex-col gap-4">
+                <div className="rounded-3xl border border-white/5 bg-slate-900/50 p-6">
+                  <p className="text-sm font-semibold text-white mb-6">Live Metrics</p>
+                  <div className="space-y-5">
+                    <SignalBar label="Global Latency" value="142 ms" width="65%" color="bg-emerald-400" />
+                    <SignalBar label="Cache Hit Rate" value="89%" width="89%" color="bg-emerald-400" />
+                    <SignalBar label="DB CPU Load" value="78%" width="78%" color="bg-amber-400" />
+                  </div>
+                </div>
+                
+                <div className="rounded-3xl border border-white/5 bg-slate-900/50 p-6 flex-1 flex flex-col justify-center">
+                   <p className="text-3xl font-bold text-white mb-1">18,402</p>
+                   <p className="text-sm text-slate-400">Requests per second</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Breakdown */}
+        <section className="pb-32">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Built for Engineers</h2>
+            <p className="mt-4 text-slate-400">Everything you need to validate your system design without provisioning a single server.</p>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-3">
+            {features.map((feature) => (
+              <div key={feature.title} className="rounded-3xl border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 hover:border-cyan-500/30">
+                <div className="mb-6 h-12 w-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="mb-24 rounded-[3rem] border border-cyan-500/20 bg-gradient-to-b from-cyan-900/20 to-slate-900 px-6 py-20 text-center sm:px-12">
+          <h2 className="text-3xl font-bold text-white sm:text-5xl">Ready to stress test {featuredSystemName}?</h2>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-slate-400">
+            Join thousands of developers validating their assumptions. No credit card required.
+          </p>
+          <div className="mt-10 flex justify-center gap-4 flex-wrap">
+            <Button href="/signup" variant="primary">
+              Create Free Account
+            </Button>
+            <Button href="/systems" variant="ghost">
+              Browse Templates
+            </Button>
+          </div>
+        </section>
+
+      </div>
     </main>
   );
 }
+
+/* Helper Components */
 
 function ArchitectureNode({
   label,
@@ -278,24 +189,24 @@ function ArchitectureNode({
 }: {
   label: string;
   type: string;
-  accent?: "slate" | "cyan" | "sky" | "emerald" | "amber";
+  accent?: "slate" | "cyan" | "blue" | "emerald" | "amber";
 }) {
   const accents = {
-    slate: "from-white/10 to-white/5 text-slate-100",
-    cyan: "from-cyan-400/20 to-cyan-400/5 text-cyan-100",
-    sky: "from-sky-400/20 to-sky-400/5 text-sky-100",
-    emerald: "from-emerald-400/20 to-emerald-400/5 text-emerald-100",
-    amber: "from-amber-400/20 to-amber-400/5 text-amber-100",
+    slate: "border-white/10 bg-white/5 text-slate-300",
+    cyan: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    blue: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    amber: "border-amber-500/30 bg-amber-500/10 text-amber-300",
   };
 
   return (
-    <div className={`rounded-2xl border border-white/10 bg-gradient-to-r p-4 ${accents[accent]}`}>
+    <div className={`w-full rounded-2xl border p-4 backdrop-blur-md transition-all hover:scale-[1.02] ${accents[accent]}`}>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-slate-400">{type}</p>
-          <p className="mt-2 text-sm font-semibold">{label}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">{type}</p>
+          <p className="text-sm font-semibold text-white">{label}</p>
         </div>
-        <div className="h-3 w-3 rounded-full bg-current opacity-80" />
+        <div className="h-2 w-2 rounded-full bg-current shadow-[0_0_10px_currentColor] animate-pulse" />
       </div>
     </div>
   );
@@ -303,17 +214,10 @@ function ArchitectureNode({
 
 function FlowConnector() {
   return (
-    <div className="flex items-center justify-center">
-      <div className="h-7 w-px bg-gradient-to-b from-cyan-300/60 to-transparent" />
-    </div>
-  );
-}
-
-function MetricRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-slate-400">{label}</span>
-      <span className="font-medium text-white">{value}</span>
+    <div className="flex items-center justify-center my-1 w-full relative">
+      <div className="h-8 w-px bg-gradient-to-b from-cyan-400 to-transparent opacity-50" />
+      {/* Animated particle down the wire */}
+      <div className="absolute top-0 h-2 w-px bg-cyan-200 shadow-[0_0_8px_#22d3ee] animate-[bounce_1.5s_infinite]" />
     </div>
   );
 }
@@ -330,13 +234,13 @@ function SignalBar({
   color: string;
 }) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-slate-300">{label}</span>
+    <div>
+      <div className="flex items-center justify-between text-sm mb-2">
+        <span className="text-slate-400">{label}</span>
         <span className="font-medium text-white">{value}</span>
       </div>
-      <div className="h-2 rounded-full bg-white/10">
-        <div className={`h-2 rounded-full ${color}`} style={{ width }} />
+      <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+        <div className={`h-full rounded-full ${color} transition-all duration-1000`} style={{ width }} />
       </div>
     </div>
   );

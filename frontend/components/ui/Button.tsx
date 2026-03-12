@@ -5,6 +5,8 @@ type ButtonProps = {
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 const variants = {
@@ -15,8 +17,17 @@ const variants = {
     "border border-white/15 bg-white/8 text-slate-100 backdrop-blur hover:border-cyan-300/40 hover:bg-white/12",
 };
 
-export function Button({ children, href, variant = "secondary", type = "button" }: ButtonProps) {
-  const className = `inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold no-underline transition ${variants[variant]}`;
+export function Button({
+  children,
+  href,
+  variant = "secondary",
+  type = "button",
+  disabled = false,
+  onClick,
+}: ButtonProps) {
+  const className = `inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold no-underline transition ${variants[variant]} ${
+    disabled ? "cursor-not-allowed opacity-60" : ""
+  }`;
 
   if (href) {
     return (
@@ -27,7 +38,7 @@ export function Button({ children, href, variant = "secondary", type = "button" 
   }
 
   return (
-    <button type={type} className={className}>
+    <button type={type} className={className} disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

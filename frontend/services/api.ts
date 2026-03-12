@@ -5,19 +5,31 @@ export async function apiGet<T>(path: string): Promise<T> {
 }
 
 export async function apiJson<T>(path: string, init: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init.headers ?? {}),
-    },
-    cache: init.cache ?? "no-store",
-  });
+  let response: Response;
 
-  const data = (await response.json().catch(() => null)) as { message?: string } | null;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init.headers ?? {}),
+      },
+      cache: init.cache ?? "no-store",
+    });
+  } catch {
+    throw new Error(
+      `Unable to reach the API at ${API_BASE_URL}. Start the backend server or update NEXT_PUBLIC_API_BASE_URL.`,
+    );
+  }
+
+  const data = (await response.json().catch(() => null)) as
+    | { message?: string | string[] }
+    | null;
+  const message =
+    Array.isArray(data?.message) ? data.message.join(", ") : data?.message;
 
   if (!response.ok) {
-    throw new Error(data?.message ?? `API request failed: ${response.status}`);
+    throw new Error(message ?? `API request failed: ${response.status}`);
   }
 
   return data as T;

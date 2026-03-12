@@ -11,12 +11,14 @@ type LoginPayload = {
   password: string;
 };
 
-type AuthResponse = {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+export type AuthResponse = {
+  user: AuthUser;
   message: string;
 };
 
