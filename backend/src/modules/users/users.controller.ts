@@ -16,4 +16,9 @@ export class UsersController {
   login(@Body() payload: LoginUserDto) {
     return this.usersService.login(payload);
   }
+
+  @Post('google')
+  google() {
+    return this.usersService.googleLogin();
+  }
 }

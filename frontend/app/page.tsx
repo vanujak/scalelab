@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { systemsService } from "@/services/systems.service";
 
 const features = [

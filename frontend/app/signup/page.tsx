@@ -13,9 +13,6 @@ export default function SignupPage() {
       <div className="relative mx-auto w-full max-w-6xl px-6 py-12 sm:px-10 lg:px-12">
         <div className="grid w-full gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <section className="flex flex-col justify-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300 backdrop-blur-md self-start">
-              Project Access
-            </div>
             <h1 className="text-5xl font-extrabold tracking-tight text-white mb-6">
               Create your <br />
               <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
@@ -39,7 +36,6 @@ export default function SignupPage() {
             <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
             <div className="relative rounded-[2rem] bg-slate-950 p-8 sm:p-10 border border-white/5">
               <div className="mb-8">
-                <p className="text-xs font-bold tracking-widest uppercase text-emerald-400 mb-2">Early Access</p>
                 <h2 className="text-3xl font-semibold text-white">Sign Up</h2>
               </div>
               <AuthForm mode="signup" />

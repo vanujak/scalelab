@@ -62,6 +62,25 @@ export class UsersService {
     };
   }
 
+  googleLogin() {
+    let user = this.users.find((entry) => entry.email === 'google@scalelab.dev');
+    
+    if (!user) {
+      user = {
+        id: `user-${this.users.length + 1}-google`,
+        name: 'Google External User',
+        email: 'google@scalelab.dev',
+        password: 'oauth-not-required',
+      };
+      this.users.push(user);
+    }
+
+    return {
+      user: this.serialize(user),
+      message: 'Authenticated automatically with Google.',
+    };
+  }
+
   private serialize(user: UserEntity) {
     return {
       id: user.id,
