@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -20,7 +24,9 @@ export class UsersService {
     }
 
     if (payload.password.length < 8) {
-      throw new BadRequestException('Password must be at least 8 characters long.');
+      throw new BadRequestException(
+        'Password must be at least 8 characters long.',
+      );
     }
 
     const normalizedEmail = payload.email.trim().toLowerCase();
@@ -63,8 +69,10 @@ export class UsersService {
   }
 
   googleLogin() {
-    let user = this.users.find((entry) => entry.email === 'google@scalelab.dev');
-    
+    let user = this.users.find(
+      (entry) => entry.email === 'google@scalelab.dev',
+    );
+
     if (!user) {
       user = {
         id: `user-${this.users.length + 1}-google`,
