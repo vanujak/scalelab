@@ -64,13 +64,13 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }
 
-  const inputStyles = "w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder-slate-500 focus:border-cyan-500 focus:bg-white/10";
-  const labelStyles = "text-sm font-medium text-slate-300";
+  const inputStyles = "w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none transition placeholder-slate-500 focus:border-cyan-500 focus:bg-white/10";
+  const labelStyles = "block text-sm font-medium text-slate-300 ml-1 mb-2";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {isSignup ? (
-        <label className="block space-y-2">
+        <label className="block">
           <span className={labelStyles}>Name</span>
           <input
             value={name}
@@ -83,7 +83,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </label>
       ) : null}
 
-      <label className="block space-y-2">
+      <label className="block">
         <span className={labelStyles}>Email</span>
         <input
           type="email"
@@ -96,7 +96,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         />
       </label>
 
-      <label className="block space-y-2">
+      <label className="block">
         <span className={labelStyles}>Password</span>
         <input
           type="password"
@@ -118,7 +118,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </Button>
       </div>
 
-      <div className="relative flex items-center items-center py-2">
+      <div className="relative flex items-center py-2">
         <div className="flex-grow border-t border-white/10" />
         <span className="mx-4 flex-shrink text-xs font-medium uppercase tracking-widest text-slate-500">
           Or
@@ -126,10 +126,10 @@ export function AuthForm({ mode }: AuthFormProps) {
         <div className="flex-grow border-t border-white/10" />
       </div>
 
-      <div>
-        <Button 
-          type="button" 
-          variant="secondary" 
+      <div className="flex justify-center">
+        <Button
+          type="button"
+          variant="secondary"
           disabled={status === "submitting"}
           onClick={handleGoogleLogin}
         >
