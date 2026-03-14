@@ -21,7 +21,10 @@ pipeline {
                     sh 'docker compose down || true'
 
                     // Build fresh images and start the containers in detached mode
-                    sh 'docker compose up -d --build'
+                    // We use withCredentials to securely pull the DATABASE_URL from Jenkins without exposing it in logs or Git
+                    withCredentials([string(credentialsId: 'scalelab-db-url', variable: 'DATABASE_URL')]) {
+                        sh 'docker compose up -d --build'
+                    }
                 }
             }
         }
