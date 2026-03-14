@@ -8,6 +8,7 @@ services:
     environment:
       - PORT=4000
       - NODE_ENV=production
+      - DATABASE_URL=postgres://3d13d8e9694d449193d00d486efdd96ef1998d11dc2731566f9752c0fb4cf260:sk_fHptR9VSf1QiAp-N9TE8X@db.prisma.io:5432/postgres?sslmode=require
     restart: always
 
   frontend:
