@@ -35,9 +35,10 @@ export const authService = {
       body: JSON.stringify(payload),
     });
   },
-  googleLogin() {
+  googleLogin(payload: { credential?: string; accessToken?: string }) {
     return apiJson<AuthResponse>("/users/google", {
       method: "POST",
+      body: JSON.stringify(payload),
     });
   },
 };

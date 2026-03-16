@@ -9,6 +9,7 @@ services:
       - PORT=4000
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     restart: always
 
   frontend:
@@ -16,12 +17,14 @@ services:
       context: ./frontend
       args:
         - NEXT_PUBLIC_API_BASE_URL=https://api.scalelab.easycase.site
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     expose:
       - "3000"
     environment:
       - PORT=3000
       - NODE_ENV=production
       - NEXT_PUBLIC_API_BASE_URL=https://api.scalelab.easycase.site
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     depends_on:
       - backend
     restart: always

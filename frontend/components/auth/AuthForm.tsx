@@ -12,6 +12,68 @@ type AuthFormProps = {
   mode: AuthMode;
 };
 
+type GoogleTokenResponse = {
+  access_token?: string;
+  error?: string;
+};
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        oauth2: {
+          initTokenClient: (options: {
+            client_id: string;
+            scope: string;
+            callback: (response: GoogleTokenResponse) => void;
+            error_callback?: (error: { type: string }) => void;
+          }) => {
+            requestAccessToken: (options?: { prompt?: string }) => void;
+          };
+        };
+      };
+    };
+  }
+}
+
+const GOOGLE_IDENTITY_SCRIPT_ID = "google-identity-services";
+const GOOGLE_IDENTITY_SCRIPT_URL = "https://accounts.google.com/gsi/client";
+let googleScriptPromise: Promise<void> | null = null;
+
+function loadGoogleScript(): Promise<void> {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("Google login is only available in the browser."));
+  }
+
+  if (window.google?.accounts?.oauth2) {
+    return Promise.resolve();
+  }
+
+  if (!googleScriptPromise) {
+    googleScriptPromise = new Promise((resolve, reject) => {
+      const existing = document.getElementById(GOOGLE_IDENTITY_SCRIPT_ID) as HTMLScriptElement | null;
+      if (existing) {
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error("Failed to load Google login script.")), {
+          once: true,
+        });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.id = GOOGLE_IDENTITY_SCRIPT_ID;
+      script.src = GOOGLE_IDENTITY_SCRIPT_URL;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Failed to load Google login script."));
+      document.head.appendChild(script);
+    });
+  }
+
+  return googleScriptPromise;
+}
+
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -19,14 +81,27 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [isGoogleReady, setIsGoogleReady] = useState(false);
 
   const isSignup = mode === "signup";
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   useEffect(() => {
     if (sessionService.getUser()) {
       router.replace("/dashboard");
     }
   }, [router]);
+
+  useEffect(() => {
+    if (!googleClientId) {
+      setIsGoogleReady(false);
+      return;
+    }
+
+    loadGoogleScript()
+      .then(() => setIsGoogleReady(true))
+      .catch(() => setIsGoogleReady(false));
+  }, [googleClientId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,11 +124,52 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   async function handleGoogleLogin() {
+    if (!googleClientId) {
+      setStatus("error");
+      setMessage("Google login is not configured. Add NEXT_PUBLIC_GOOGLE_CLIENT_ID.");
+      return;
+    }
+
     setStatus("submitting");
     setMessage("");
 
     try {
-      const response = await authService.googleLogin();
+      await loadGoogleScript();
+      const oauth2 = window.google?.accounts?.oauth2;
+      if (!oauth2) {
+        throw new Error("Google login script did not initialize.");
+      }
+
+      const accessToken = await new Promise<string>((resolve, reject) => {
+        const timeout = window.setTimeout(() => {
+          reject(new Error("Google sign-in was cancelled or timed out."));
+        }, 60000);
+
+        const tokenClient = oauth2.initTokenClient({
+          client_id: googleClientId,
+          scope: "openid email profile",
+          callback: (response) => {
+            window.clearTimeout(timeout);
+            if (response.error) {
+              reject(new Error(`Google OAuth failed: ${response.error}`));
+              return;
+            }
+            if (!response.access_token) {
+              reject(new Error("Google did not return an access token."));
+              return;
+            }
+            resolve(response.access_token);
+          },
+          error_callback: () => {
+            window.clearTimeout(timeout);
+            reject(new Error("Google sign-in popup was closed."));
+          },
+        });
+
+        tokenClient.requestAccessToken({ prompt: "consent" });
+      });
+
+      const response = await authService.googleLogin({ accessToken });
       sessionService.setUser(response.user);
       setStatus("success");
       setMessage(`${response.message} Redirecting to dashboard...`);
@@ -130,7 +246,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <Button
           type="button"
           variant="secondary"
-          disabled={status === "submitting"}
+          disabled={status === "submitting" || !isGoogleReady}
           onClick={handleGoogleLogin}
         >
           <span className="flex w-full items-center justify-center gap-3">

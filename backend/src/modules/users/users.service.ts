@@ -6,8 +6,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 import { Pool } from 'pg';
 import { DATABASE_POOL } from '../../database/database.module';
+import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 
@@ -99,18 +101,130 @@ export class UsersService implements OnModuleInit {
     };
   }
 
-  async googleLogin() {
-    const googleEmail = 'google@scalelab.dev';
+  async googleLogin(payload: GoogleLoginDto) {
+    if (!payload.credential?.trim() && !payload.accessToken?.trim()) {
+      throw new BadRequestException(
+        'Google credential or access token is required.',
+      );
+    }
+
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!googleClientId) {
+      throw new BadRequestException(
+        'Google login is not configured on the server.',
+      );
+    }
+
+    let normalizedEmail: string;
+    let displayName: string;
+
+    try {
+      let profile: {
+        aud?: string;
+        email?: string;
+        email_verified?: string;
+        name?: string;
+        given_name?: string;
+      };
+
+      if (payload.credential?.trim()) {
+        const verificationResponse = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(payload.credential)}`,
+        );
+
+        if (!verificationResponse.ok) {
+          throw new UnauthorizedException('Invalid Google credential.');
+        }
+
+        profile = (await verificationResponse.json()) as {
+          aud?: string;
+          email?: string;
+          email_verified?: string;
+          name?: string;
+          given_name?: string;
+        };
+      } else {
+        const tokenInfoResponse = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(payload.accessToken!)}`,
+        );
+
+        if (!tokenInfoResponse.ok) {
+          throw new UnauthorizedException('Invalid Google access token.');
+        }
+
+        const tokenInfo = (await tokenInfoResponse.json()) as { aud?: string };
+
+        if (tokenInfo.aud !== googleClientId) {
+          throw new UnauthorizedException(
+            'Google token does not match this application.',
+          );
+        }
+
+        const userInfoResponse = await fetch(
+          'https://openidconnect.googleapis.com/v1/userinfo',
+          {
+            headers: {
+              Authorization: `Bearer ${payload.accessToken}`,
+            },
+          },
+        );
+
+        if (!userInfoResponse.ok) {
+          throw new UnauthorizedException(
+            'Unable to fetch Google account profile.',
+          );
+        }
+
+        const userInfo = (await userInfoResponse.json()) as {
+          email?: string;
+          email_verified?: boolean;
+          name?: string;
+          given_name?: string;
+        };
+
+        profile = {
+          aud: tokenInfo.aud,
+          email: userInfo.email,
+          email_verified: userInfo.email_verified ? 'true' : 'false',
+          name: userInfo.name,
+          given_name: userInfo.given_name,
+        };
+      }
+
+      if (profile.aud !== googleClientId) {
+        throw new UnauthorizedException(
+          'Google credential does not match this application.',
+        );
+      }
+
+      if (!profile.email || profile.email_verified !== 'true') {
+        throw new UnauthorizedException(
+          'Google account does not have a verified email.',
+        );
+      }
+
+      normalizedEmail = profile.email.trim().toLowerCase();
+      displayName =
+        profile.name?.trim() ||
+        profile.given_name?.trim() ||
+        normalizedEmail.split('@')[0];
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Google authentication failed.');
+    }
 
     const existing = await this.pool.query(
       'SELECT id, name, email FROM users WHERE email = $1',
-      [googleEmail],
+      [normalizedEmail],
     );
 
     if (existing.rows.length > 0) {
       return {
         user: existing.rows[0],
-        message: 'Authenticated automatically with Google.',
+        message: 'Google login successful.',
       };
     }
 
@@ -119,15 +233,15 @@ export class UsersService implements OnModuleInit {
        VALUES ($1, $2, $3)
        RETURNING id, name, email`,
       [
-        'Google External User',
-        googleEmail,
-        await bcrypt.hash('oauth-not-required', SALT_ROUNDS),
+        displayName,
+        normalizedEmail,
+        await bcrypt.hash(`google-oauth-${randomUUID()}`, SALT_ROUNDS),
       ],
     );
 
     return {
       user: result.rows[0],
-      message: 'Authenticated automatically with Google.',
+      message: 'Google account linked successfully.',
     };
   }
 }

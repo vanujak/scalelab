@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from './users.service';
@@ -18,7 +19,7 @@ export class UsersController {
   }
 
   @Post('google')
-  google() {
-    return this.usersService.googleLogin();
+  google(@Body() payload: GoogleLoginDto) {
+    return this.usersService.googleLogin(payload);
   }
 }
