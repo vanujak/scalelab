@@ -21,9 +21,16 @@ pipeline {
                     sh 'docker compose down || true'
 
                     // Build fresh images and start the containers in detached mode
-                    // We use withCredentials to securely pull the DATABASE_URL from Jenkins without exposing it in logs or Git
-                    withCredentials([string(credentialsId: 'scalelab-db-url', variable: 'DATABASE_URL')]) {
-                        sh 'docker compose up -d --build'
+                    // Pull sensitive values from Jenkins credentials (not from repo env files).
+                    // GOOGLE_CLIENT_ID is used by backend, and also exported to NEXT_PUBLIC_GOOGLE_CLIENT_ID for frontend build/runtime.
+                    withCredentials([
+                        string(credentialsId: 'scalelab-db-url', variable: 'DATABASE_URL'),
+                        string(credentialsId: 'scalelab-google-client-id', variable: 'GOOGLE_CLIENT_ID')
+                    ]) {
+                        sh '''
+                            export NEXT_PUBLIC_GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID"
+                            docker compose up -d --build
+                        '''
                     }
                 }
             }
