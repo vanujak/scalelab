@@ -88,7 +88,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   useEffect(() => {
     if (sessionService.getUser()) {
-      router.replace("/dashboard");
+      router.replace("/playground");
     }
   }, [router]);
 
@@ -116,7 +116,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       sessionService.setUser(response.user);
       setStatus("success");
       setMessage(`${response.message} Redirecting to dashboard...`);
-      router.replace("/dashboard");
+      router.replace("/playground");
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Request failed.");
@@ -173,7 +173,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       sessionService.setUser(response.user);
       setStatus("success");
       setMessage(`${response.message} Redirecting to dashboard...`);
-      router.replace("/dashboard");
+      router.replace("/playground");
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Request failed.");

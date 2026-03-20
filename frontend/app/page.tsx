@@ -73,11 +73,11 @@ export default function Home() {
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <Button href="/systems" variant="primary">
+            <Button href="/playground" variant="primary">
               Start Building
             </Button>
-            <Button href="/dashboard" variant="ghost">
-              Open Dashboard
+            <Button href="/playground" variant="ghost">
+              Open Playground
             </Button>
           </div>
         </section>
@@ -168,8 +168,8 @@ export default function Home() {
             <Button href="/signup" variant="primary">
               Create Free Account
             </Button>
-            <Button href="/systems" variant="ghost">
-              Browse Templates
+            <Button href="/playground" variant="ghost">
+              Open Playground
             </Button>
           </div>
         </section>
