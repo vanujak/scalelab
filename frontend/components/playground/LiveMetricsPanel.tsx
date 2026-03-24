@@ -65,7 +65,7 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
       : "text-rose-400";
 
   return (
-    <div className="flex flex-col p-4 gap-4 overflow-y-auto">
+    <div className="flex flex-col p-3 gap-2.5 overflow-hidden flex-1">
       {/* Status */}
       <div className="flex items-center gap-2">
         <div
@@ -75,13 +75,13 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
               : "bg-slate-500"
           }`}
         />
-        <span className="text-xs font-bold tracking-widest uppercase text-slate-400">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400">
           {simulationStatus === "running" ? "Live Metrics" : "Last Snapshot"}
         </span>
       </div>
 
       {/* Primary Metrics */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1.5">
         <MetricCard
           label="Latency"
           value={`${metrics.latencyMs}`}
@@ -110,10 +110,10 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
 
       {/* Resource Gauges */}
       <div>
-        <p className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-3">
+        <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-1.5">
           Resources
         </p>
-        <div className="space-y-3">
+        <div className="space-y-2">
           <GaugeBar label="CPU Usage" value={metrics.cpuUsage} colorClass={cpuColor} />
           <GaugeBar
             label="Memory"
@@ -125,27 +125,27 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
 
       {/* Connection Stats */}
       <div>
-        <p className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-3">
+        <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-1.5">
           Connections
         </p>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-            <p className="text-xs text-slate-500 mb-1">Active</p>
-            <p className="text-lg font-bold text-white">{metrics.activeConnections}</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          <div className="rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5">
+            <p className="text-[10px] text-slate-500">Active</p>
+            <p className="text-sm font-bold text-white">{metrics.activeConnections}</p>
           </div>
-          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-            <p className="text-xs text-slate-500 mb-1">In-Flight</p>
-            <p className="text-lg font-bold text-white">{metrics.requestsInFlight}</p>
+          <div className="rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5">
+            <p className="text-[10px] text-slate-500">In-Flight</p>
+            <p className="text-sm font-bold text-white">{metrics.requestsInFlight}</p>
           </div>
         </div>
       </div>
 
       {/* Saturation Warnings */}
       {metrics.saturationPoints.length > 0 && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-2">
+          <div className="flex items-center gap-1.5 mb-1">
             <svg
-              className="h-4 w-4 text-rose-400"
+              className="h-3.5 w-3.5 text-rose-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -157,14 +157,14 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <p className="text-xs font-bold text-rose-400 uppercase tracking-wider">
+            <p className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">
               Saturation Detected
             </p>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {metrics.saturationPoints.map((point) => (
-              <p key={point} className="text-xs text-rose-300 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              <p key={point} className="text-[10px] text-rose-300 flex items-center gap-1">
+                <span className="h-1 w-1 rounded-full bg-rose-400" />
                 {point} is under heavy load
               </p>
             ))}
@@ -174,12 +174,12 @@ export function LiveMetricsPanel({ metrics, simulationStatus }: Props) {
 
       {/* Latency Timeline Mini-Chart */}
       {history.length > 1 && (
-        <div>
-          <p className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-3">
+        <div className="mt-auto">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-1.5">
             Latency Timeline
           </p>
-          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-            <div className="flex items-end gap-1 h-20">
+          <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2">
+            <div className="flex items-end gap-0.5 h-12">
               {history.map((h, i) => {
                 const maxLatency = Math.max(...history.map((m) => m.latencyMs), 1);
                 const heightPct = (h.latencyMs / maxLatency) * 100;
@@ -218,11 +218,11 @@ function MetricCard({
   colorClass: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
-      <div className="flex items-baseline gap-1">
-        <span className={`text-xl font-bold ${colorClass}`}>{value}</span>
-        <span className="text-xs text-slate-500">{unit}</span>
+    <div className="rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5">
+      <p className="text-[10px] text-slate-500">{label}</p>
+      <div className="flex items-baseline gap-0.5">
+        <span className={`text-base font-bold ${colorClass}`}>{value}</span>
+        <span className="text-[10px] text-slate-500">{unit}</span>
       </div>
     </div>
   );
@@ -246,11 +246,11 @@ function GaugeBar({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs text-slate-400">{label}</span>
-        <span className={`text-xs font-semibold ${colorClass}`}>{value}%</span>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] text-slate-400">{label}</span>
+        <span className={`text-[10px] font-semibold ${colorClass}`}>{value}%</span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+      <div className="h-1 rounded-full bg-white/5 overflow-hidden">
         <div
           className={`h-full rounded-full ${barColor} transition-all duration-700`}
           style={{ width: `${Math.min(value, 100)}%` }}

@@ -68,40 +68,39 @@ const PALETTE_ITEMS: {
 
 export function ComponentPalette({ onAddNode, connectingFrom, onCancelConnect }: Props) {
   return (
-    <div className="flex flex-col h-full p-4 overflow-y-auto">
-      <div className="mb-5">
-        <p className="text-xs font-bold tracking-widest uppercase text-cyan-400 mb-1">Components</p>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          Click to add a component to the canvas
-        </p>
+    <div className="flex flex-col h-full p-3 overflow-hidden">
+      <div className="mb-3">
+        <p className="text-xs font-bold tracking-widest uppercase text-cyan-400 mb-0.5">Components</p>
+        <p className="text-[10px] text-slate-500">Click to add to canvas</p>
       </div>
 
       {connectingFrom && (
-        <div className="mb-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
-          <p className="text-xs font-medium text-cyan-300 mb-2">Connecting mode</p>
-          <p className="text-xs text-slate-400 leading-relaxed mb-2">
-            Click a target node on the canvas to create a connection.
+        <div className="mb-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-2">
+          <p className="text-[10px] font-medium text-cyan-300 mb-1">Connecting mode</p>
+          <p className="text-[10px] text-slate-400 mb-1">
+            Click a target node to connect.
           </p>
           <button
             onClick={onCancelConnect}
-            className="text-xs text-rose-400 hover:text-rose-300 font-medium transition"
+            className="text-[10px] text-rose-400 hover:text-rose-300 font-medium transition"
           >
             Cancel
           </button>
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-1.5 flex-1">
         {PALETTE_ITEMS.map((item) => (
           <button
             key={item.type}
             onClick={() => onAddNode(item.type)}
-            className={`w-full rounded-xl border p-3 text-left transition-all duration-200 ${item.bgColor} group`}
+            title={item.description}
+            className={`w-full rounded-lg border px-2.5 py-2 text-left transition-all duration-200 ${item.bgColor} group`}
           >
-            <div className="flex items-start gap-3">
-              <div className={`flex-shrink-0 mt-0.5 ${item.color}`}>
+            <div className="flex items-center gap-2.5">
+              <div className={`flex-shrink-0 ${item.color}`}>
                 <svg
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -112,43 +111,22 @@ export function ComponentPalette({ onAddNode, connectingFrom, onCancelConnect }:
                   <path d={item.icon} />
                 </svg>
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-white group-hover:text-white/90">
-                  {item.label}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
+              <span className="text-xs font-semibold text-white group-hover:text-white/90">
+                {item.label}
+              </span>
             </div>
           </button>
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-white/5">
-        <p className="text-xs font-bold tracking-widest uppercase text-slate-500 mb-3">Quick Tips</p>
-        <div className="space-y-2 text-xs text-slate-600 leading-relaxed">
-          <p className="flex items-start gap-2">
-            <span className="text-cyan-500 mt-0.5">•</span>
-            Drag nodes to reposition them on the canvas
-          </p>
-          <p className="flex items-start gap-2">
-            <span className="text-cyan-500 mt-0.5">•</span>
-            Click a node to select it and edit properties
-          </p>
-          <p className="flex items-start gap-2">
-            <span className="text-cyan-500 mt-0.5">•</span>
-            Use &quot;Connect&quot; button to draw edges between nodes
-          </p>
-          <p className="flex items-start gap-2">
-            <span className="text-cyan-500 mt-0.5">•</span>
-            Click an edge label to remove the connection
-          </p>
-          <p className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">▶</span>
-            Run simulation to see live traffic flow
-          </p>
-        </div>
+      <div className="mt-auto pt-3 border-t border-white/5">
+        <p className="text-[10px] text-slate-600 leading-relaxed">
+          <span className="text-cyan-500">•</span> Drag to move
+          <span className="text-slate-700 mx-1">|</span>
+          <span className="text-cyan-500">•</span> Click to select
+          <span className="text-slate-700 mx-1">|</span>
+          <span className="text-emerald-500">▶</span> Run to simulate
+        </p>
       </div>
     </div>
   );

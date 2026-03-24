@@ -200,7 +200,7 @@ export function PlaygroundCanvas({
             id="arrowhead"
             markerWidth="10"
             markerHeight="7"
-            refX="0"
+            refX="10"
             refY="3.5"
             orient="auto"
           >
@@ -210,7 +210,7 @@ export function PlaygroundCanvas({
             id="arrowhead-active"
             markerWidth="10"
             markerHeight="7"
-            refX="0"
+            refX="10"
             refY="3.5"
             orient="auto"
           >
@@ -235,10 +235,10 @@ export function PlaygroundCanvas({
           const tgtCenter = getNodeCenter(targetNode);
           const isActive = simulationStatus === "running";
 
-          // Clip line start to source node border (no inset needed)
+          // Clip line start to source node border
           const lineStart = clipToNodeEdge(srcCenter, tgtCenter, HALF_W, HALF_H);
-          // Clip line end to target node border, pulled back by the arrowhead size
-          const lineEnd = clipToNodeEdge(tgtCenter, srcCenter, HALF_W, HALF_H, ARROW_INSET);
+          // Clip line end to target node border (refX=10 means tip is at line endpoint)
+          const lineEnd = clipToNodeEdge(tgtCenter, srcCenter, HALF_W, HALF_H);
 
           const midX = (lineStart.x + lineEnd.x) / 2;
           const midY = (lineStart.y + lineEnd.y) / 2;

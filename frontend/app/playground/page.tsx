@@ -87,11 +87,21 @@ export default function PlaygroundPage() {
   const [edges, setEdges] = useState<PlaygroundEdge[]>(DEFAULT_EDGES);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
+  const [pendingConnection, setPendingConnection] = useState<{ source: string; target: string } | null>(null);
   const [simulation, setSimulation] = useState<SimulationState>({ status: "idle" });
   const [metrics, setMetrics] = useState<SimulationMetrics | null>(null);
   const [showPalette, setShowPalette] = useState(true);
   const [showMetrics, setShowMetrics] = useState(false);
   const simulationRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const CONNECTION_TYPES = [
+    { label: "HTTP", latency: 5, color: "border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" },
+    { label: "HTTPS", latency: 8, color: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" },
+    { label: "TCP", latency: 2, color: "border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" },
+    { label: "WebSocket", latency: 3, color: "border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20" },
+    { label: "gRPC", latency: 2, color: "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" },
+    { label: "UDP", latency: 1, color: "border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" },
+  ];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -156,20 +166,30 @@ export default function PlaygroundPage() {
   function handleNodeClick(nodeId: string) {
     if (connectingFrom) {
       if (connectingFrom !== nodeId) {
-        const edgeId = `edge-${Date.now()}`;
-        const newEdge: PlaygroundEdge = {
-          id: edgeId,
-          source: connectingFrom,
-          target: nodeId,
-          label: "TCP",
-          latencyMs: 5,
-        };
-        setEdges((prev) => [...prev, newEdge]);
+        setPendingConnection({ source: connectingFrom, target: nodeId });
       }
       setConnectingFrom(null);
     } else {
       setSelectedNodeId(nodeId);
     }
+  }
+
+  function handleCreateConnection(label: string, latencyMs: number) {
+    if (!pendingConnection) return;
+    const edgeId = `edge-${Date.now()}`;
+    const newEdge: PlaygroundEdge = {
+      id: edgeId,
+      source: pendingConnection.source,
+      target: pendingConnection.target,
+      label,
+      latencyMs,
+    };
+    setEdges((prev) => [...prev, newEdge]);
+    setPendingConnection(null);
+  }
+
+  function handleCancelPending() {
+    setPendingConnection(null);
   }
 
   function handleStartConnect(nodeId: string) {
@@ -283,7 +303,7 @@ export default function PlaygroundPage() {
 
   if (user === undefined) {
     return (
-      <main className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <main className="h-screen bg-[#020617] flex items-center justify-center">
         <div className="h-8 w-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
       </main>
     );
@@ -292,7 +312,7 @@ export default function PlaygroundPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-100 flex flex-col overflow-hidden">
+    <main className="h-screen bg-[#020617] text-slate-100 flex flex-col overflow-hidden">
       {/* Background Gradients */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-[120px]" />
@@ -426,10 +446,50 @@ export default function PlaygroundPage() {
               Click a target node to connect, or Esc to cancel
             </div>
           )}
+
+          {/* Connection Type Picker Modal */}
+          {pendingConnection && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center">
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={handleCancelPending}
+              />
+              {/* Modal */}
+              <div className="relative rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-black/50 p-5 w-72">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-semibold text-white">Connection Type</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Select the protocol for this edge</p>
+                  </div>
+                  <button
+                    onClick={handleCancelPending}
+                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 transition"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {CONNECTION_TYPES.map((ct) => (
+                    <button
+                      key={ct.label}
+                      onClick={() => handleCreateConnection(ct.label, ct.latency)}
+                      className={`rounded-xl border px-3 py-2.5 text-left transition-all duration-200 ${ct.color}`}
+                    >
+                      <p className="text-xs font-semibold">{ct.label}</p>
+                      <p className="text-[10px] opacity-60 mt-0.5">{ct.latency}ms latency</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Config / Metrics Panel */}
-        <aside className="relative z-40 w-80 flex-shrink-0 border-l border-white/10 bg-slate-950/60 backdrop-blur-xl flex flex-col overflow-y-auto">
+        <aside className="relative z-40 w-80 flex-shrink-0 border-l border-white/10 bg-slate-950/60 backdrop-blur-xl flex flex-col overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-white/10">
             <button
