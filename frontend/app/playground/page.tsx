@@ -10,6 +10,8 @@ import { ComponentPalette } from "@/components/playground/ComponentPalette";
 import { NodeConfigPanel } from "@/components/playground/NodeConfigPanel";
 import { SimulationEngine } from "@/components/playground/SimulationEngine";
 import { LiveMetricsPanel } from "@/components/playground/LiveMetricsPanel";
+import { SavedPlaygroundsPanel } from "@/components/playground/SavedPlaygroundsPanel";
+import { playgroundService } from "@/services/playground.service";
 import type {
   PlaygroundNode,
   PlaygroundEdge,
@@ -92,6 +94,11 @@ export default function PlaygroundPage() {
   const [metrics, setMetrics] = useState<SimulationMetrics | null>(null);
   const [showPalette, setShowPalette] = useState(true);
   const [showMetrics, setShowMetrics] = useState(false);
+  const [showSavedPanel, setShowSavedPanel] = useState(false);
+  const [activePlaygroundId, setActivePlaygroundId] = useState<string | null>(null);
+  const [activePlaygroundName, setActivePlaygroundName] = useState<string | null>(null);
+  const [isRenamingHeader, setIsRenamingHeader] = useState(false);
+  const [headerRenameValue, setHeaderRenameValue] = useState("");
   const simulationRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const CONNECTION_TYPES = [
@@ -291,6 +298,40 @@ export default function PlaygroundPage() {
     setConnectingFrom(null);
     setMetrics(null);
     setShowMetrics(false);
+    setActivePlaygroundId(null);
+    setActivePlaygroundName(null);
+    setIsRenamingHeader(false);
+  }
+
+  function handleLoadPlayground(loadedNodes: PlaygroundNode[], loadedEdges: PlaygroundEdge[], name: string, id: string) {
+    handleStopSimulation();
+    setNodes(loadedNodes);
+    setEdges(loadedEdges);
+    setSelectedNodeId(null);
+    setConnectingFrom(null);
+    setMetrics(null);
+    setShowMetrics(false);
+    setActivePlaygroundId(id);
+    setActivePlaygroundName(name);
+    setShowSavedPanel(false);
+    setIsRenamingHeader(false);
+  }
+
+  async function handleHeaderRename() {
+    if (!activePlaygroundId || !user) return;
+    const name = headerRenameValue.trim();
+    if (!name || name === activePlaygroundName) {
+      setIsRenamingHeader(false);
+      return;
+    }
+    try {
+      await playgroundService.rename(activePlaygroundId, user.id, name);
+      setActivePlaygroundName(name);
+      setIsRenamingHeader(false);
+    } catch (e) {
+      console.error("Rename failed", e);
+      setIsRenamingHeader(false);
+    }
   }
 
   useEffect(() => {
@@ -330,7 +371,53 @@ export default function PlaygroundPage() {
             <span className="text-lg font-bold tracking-tight text-white">ScaleLab</span>
           </div>
           <div className="mx-4 h-6 w-px bg-white/10" />
-          <span className="text-sm font-medium text-cyan-300">System Design Playground</span>
+          {activePlaygroundName && isRenamingHeader ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                onFocus={(e) => e.target.select()}
+                value={headerRenameValue}
+                onChange={(e) => setHeaderRenameValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleHeaderRename();
+                  if (e.key === "Escape") {
+                    setHeaderRenameValue(activePlaygroundName || "");
+                    setIsRenamingHeader(false);
+                  }
+                }}
+                onBlur={() => handleHeaderRename()}
+                className="rounded-md border border-violet-500/30 bg-white/5 px-2 py-0.5 text-sm font-medium text-white outline-none focus:border-violet-500/60 transition-all w-48"
+              />
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                if (activePlaygroundName) {
+                  setHeaderRenameValue(activePlaygroundName);
+                  setIsRenamingHeader(true);
+                }
+              }}
+              disabled={!activePlaygroundName}
+              className={`text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-violet-500/50 rounded ${
+                activePlaygroundName 
+                  ? "text-cyan-300 hover:text-cyan-200 cursor-pointer flex items-center gap-1.5"
+                  : "text-cyan-300 cursor-default"
+              }`}
+              title={activePlaygroundName ? "Click to rename" : ""}
+            >
+              {activePlaygroundName ? activePlaygroundName : "System Design Playground"}
+              {activePlaygroundName && (
+                <svg className="h-3.5 w-3.5 opacity-40 hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
+              )}
+            </button>
+          )}
+          {activePlaygroundName && !isRenamingHeader && (
+            <span className="ml-2 inline-flex items-center rounded-full bg-violet-500/15 border border-violet-500/25 px-2 py-0.5 text-[9px] font-bold text-violet-400 uppercase tracking-wider">
+              Saved
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -377,6 +464,16 @@ export default function PlaygroundPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Reset
+          </button>
+
+          <button
+            onClick={() => setShowSavedPanel(true)}
+            className="inline-flex h-9 items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 text-sm font-semibold text-violet-400 transition hover:bg-violet-500/20"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+            </svg>
+            Saved
           </button>
 
           <div className="mx-2 h-6 w-px bg-white/10" />
@@ -544,6 +641,17 @@ export default function PlaygroundPage() {
           )}
         </aside>
       </div>
+
+      {/* Saved Playgrounds Panel */}
+      <SavedPlaygroundsPanel
+        userId={user.id}
+        currentNodes={nodes}
+        currentEdges={edges}
+        onLoad={handleLoadPlayground}
+        isOpen={showSavedPanel}
+        onClose={() => setShowSavedPanel(false)}
+        activePlaygroundId={activePlaygroundId}
+      />
     </main>
   );
 }

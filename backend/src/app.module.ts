@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 import { SimulationModule } from './modules/simulation/simulation.module';
+import { PlaygroundsModule } from './modules/playgrounds/playgrounds.module';
 import { SystemsModule } from './modules/systems/systems.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -16,6 +17,7 @@ import { UsersModule } from './modules/users/users.module';
     SystemsModule,
     SimulationModule,
     MetricsModule,
+    PlaygroundsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
